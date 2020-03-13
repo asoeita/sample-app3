@@ -11,6 +11,7 @@ class UsersController < ApplicationController
   def create
     @user = User.new(user_params)
     if @user.save
+      log_in @user
       flash[:success] = "welcome to the sample app!" #次の次のリクエストが飛ぶまで続く
       redirect_to @user #デフォルトでid情報を渡す
       #GETリクエストを送る
