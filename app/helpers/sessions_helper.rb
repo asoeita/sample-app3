@@ -12,6 +12,11 @@ module SessionsHelper
     cookies.permanent.signed[:user_id] = user.id #user_idを暗号化してcookiesへ代入
     cookies.permanent[:remember_taken] = user.remember
   end
+
+  def current_user?(user)
+     user == current_user
+  end
+
 # 現在ログイン中のユーザーを返す (いる場合)
   def current_user
     if (user_id = session[:user_id]) #ローカル変数に代入 セッションidを代入しそれを評価
@@ -41,7 +46,7 @@ module SessionsHelper
    user.forget
    cookies.delete(:user_id)
    cookies.delete(:remember_token)
- end
+  end
 
  # 現在のユーザーをログアウトする
   def log_out
@@ -49,4 +54,15 @@ module SessionsHelper
     session.delete(:user_id)
     @current_user = nil
   end
+
+  # 記憶したURL (もしくはデフォルト値) にリダイレクト
+   def redirect_back_or(default)
+     redirect_to(session[:forwarding_url] || default)
+     session.delete(:forwarding_url)
+   end
+
+   # アクセスしようとしたURLを覚えておく
+   def store_location
+     session[:forwarding_url] = request.original_url if request.get? #HEEPリクエストがGETの時だけ実行
+   end
 end
